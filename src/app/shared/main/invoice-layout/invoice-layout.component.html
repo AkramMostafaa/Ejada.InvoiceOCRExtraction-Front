@@ -1,0 +1,22 @@
+<div class="container shadow rounded my-5 py-3">
+  <div class="row">
+    <form [formGroup]="dataOfInvoice" (ngSubmit)="submit()">
+      <div class="form-group mb-3">
+        <label for="invoice">Invoice</label>
+        <input
+          type="file"
+          class="form-control"
+          id="invoice"
+          accept=".pdf, .jpg, .jpeg"
+          (change)="onFileSelected($event)"
+        />
+      </div>
+      <div>
+        <button class="btn btn-outline-primary" type="submit">Send File</button>
+      </div>
+    </form>
+  </div>
+</div>
+ <div *ngIf="parsedInvoiceData">
+    <app-forms-invoice [invoiceData]="parsedInvoiceData"></app-forms-invoice>
+  </div>
