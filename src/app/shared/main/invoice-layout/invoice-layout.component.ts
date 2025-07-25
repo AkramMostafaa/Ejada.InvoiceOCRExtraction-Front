@@ -11,7 +11,9 @@ import { FormsInvoiceComponent } from '../../components/forms-invoice/forms-invo
 import { InvoiceService } from '../../../core/services/invoice.service';
 import { InvoiceData } from '../../../core/models/data';
 import { CommonModule } from '@angular/common';
-
+import { ToastrService } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 @Component({
   selector: 'app-invoice-layout',
   standalone: true,
@@ -25,7 +27,7 @@ export class InvoiceLayoutComponent {
   });
 
   parsedInvoiceData: InvoiceData | null = null;
-  constructor(private invoiceService: InvoiceService) {}
+  constructor(private invoiceService: InvoiceService, private toastr: ToastrService) {}
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -45,7 +47,7 @@ export class InvoiceLayoutComponent {
           console.log('Upload Response:', res);
           if (res.success) {
                       if (res.success) {
-         
+           this.toastr.success(res.message);
           const patchedData = {
             ...res.data,
             invoiceDate: res.data.invoiceDate.slice(0, 10)
@@ -54,12 +56,14 @@ export class InvoiceLayoutComponent {
         }
           } else {
             console.error('API Error:', res.errors);
+            this.toastr.error(res.message);
           }
         },
         error: (err) => console.error('HTTP Error:', err),
       });
     } else {
       console.error('No file selected.');
+       this.toastr.warning('Please Enter a file ⚠️');
     }
   }
 }

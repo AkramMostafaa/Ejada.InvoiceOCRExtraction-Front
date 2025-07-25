@@ -3,6 +3,7 @@ import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } fr
 import { InvoiceData } from '../../../core/models/data';
 import { InvoiceService } from '../../../core/services/invoice.service';
 import { NgForOf } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-forms-invoice',
@@ -10,15 +11,17 @@ import { NgForOf } from '@angular/common';
   imports: [ReactiveFormsModule, NgForOf],
   templateUrl: './forms-invoice.component.html',
   styleUrl: './forms-invoice.component.scss',
+   
 })
-export class FormsInvoiceComponent implements OnInit {
+export class FormsInvoiceComponent implements OnInit ,OnChanges {
   @Input() invoiceData: InvoiceData | null = null;
 
   formsData!: FormGroup;
 
-  constructor(private fb: FormBuilder, private invoiceService: InvoiceService) {}
+  constructor(private fb: FormBuilder, private invoiceService: InvoiceService, private toastr : ToastrService) {}
 
   ngOnInit() {
+  
      this.initForm();
     if (this.invoiceData) {
       this.patchForm(this.invoiceData);
@@ -37,8 +40,8 @@ export class FormsInvoiceComponent implements OnInit {
       invoiceDate: ['', Validators.required],
       invoiceNumber: ['', Validators.required],
       totalAmount: [0, Validators.required],
-      vat: [0, Validators.required],
-      invoiceDetails: this.fb.array([], Validators.required),
+      vat: [0, Validators.required],  
+      invoiceDetails: this.fb.array([]) 
     });
   }
 
@@ -73,14 +76,25 @@ export class FormsInvoiceComponent implements OnInit {
   submit(form: FormGroup) {
     if (form.valid) {
       const payload: InvoiceData = form.value;
+
       this.invoiceService.submitInvoice(payload).subscribe({
         next: (res) => {
           console.log('Submit response:', res);
+          if (res.success) {
+            this.toastr.success(res.message || 'Invoice submitted successfully');
+          } else {
+            this.toastr.error(res.message || 'Invoice submission failed');
+          }
         },
-        error: (err) => console.error('Submit error:', err),
+        error: (err) => {
+          console.error('Submit error:', err);
+          this.toastr.error('Something went wrong during submission ❌');
+        }
       });
     } else {
+      form.markAllAsTouched();
       console.error('Form invalid');
+      this.toastr.warning('Please fill in all required fields ⚠️');
     }
   }
 }

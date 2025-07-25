@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable ,of } from 'rxjs';
 import { GeneralResponse, InvoiceData } from '../models/data';
-
+import { ToastrService } from 'ngx-toastr';
 @Injectable({
   providedIn: 'root',
 })
@@ -10,7 +10,7 @@ export class InvoiceService {
   private apiUrl = 'http://localhost:5042/api/Invoices/upload';
   private submitUrl = 'http://localhost:5042/api/Invoices/submit';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private toastr: ToastrService) {}
 uploadInvoice(file: File): Observable<GeneralResponse<InvoiceData>> {
   const useMock = false; 
 
@@ -65,4 +65,5 @@ uploadInvoice(file: File): Observable<GeneralResponse<InvoiceData>> {
       responseType: 'json',
     });
   }
+
 }
