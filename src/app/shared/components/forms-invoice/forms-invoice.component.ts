@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit,OnChanges,SimpleChanges  } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InvoiceData } from '../../../core/models/data';
 import { InvoiceService } from '../../../core/services/invoice.service';
@@ -19,6 +19,19 @@ export class FormsInvoiceComponent implements OnInit {
   constructor(private fb: FormBuilder, private invoiceService: InvoiceService) {}
 
   ngOnInit() {
+     this.initForm();
+    if (this.invoiceData) {
+      this.patchForm(this.invoiceData);
+    }
+  }
+ ngOnChanges(changes: SimpleChanges): void {
+  if (changes['invoiceData'] && this.invoiceData && this.formsData) {
+    this.formsData.reset(); 
+    this.patchForm(this.invoiceData);
+  }
+}
+
+     initForm() {
     this.formsData = this.fb.group({
       customerName: ['', Validators.required],
       invoiceDate: ['', Validators.required],
@@ -27,13 +40,10 @@ export class FormsInvoiceComponent implements OnInit {
       vat: [0, Validators.required],
       invoiceDetails: this.fb.array([], Validators.required),
     });
-
-    if (this.invoiceData) {
-      this.patchForm(this.invoiceData);
-    }
   }
 
   patchForm(data: InvoiceData) {
+     this.formsData.reset(); 
     this.formsData.patchValue({
       customerName: data.customerName,
       invoiceDate: data.invoiceDate,
@@ -43,6 +53,7 @@ export class FormsInvoiceComponent implements OnInit {
     });
 
     const details = this.formsData.get('invoiceDetails') as FormArray;
+      details.clear();
     data.invoiceDetails.forEach((d) => {
       details.push(
         this.fb.group({

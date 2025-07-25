@@ -45,7 +45,7 @@ export class InvoiceLayoutComponent {
           console.log('Upload Response:', res);
           if (res.success) {
                       if (res.success) {
-          // 👇 عالج التاريخ هنا
+         
           const patchedData = {
             ...res.data,
             invoiceDate: res.data.invoiceDate.slice(0, 10)
